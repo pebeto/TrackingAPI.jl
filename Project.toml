@@ -1,0 +1,18 @@
+name = "TrackingAPI"
+uuid = "bcf306fc-d39d-4f25-b732-26abcc96baf2"
+authors = ["Jose Esparza <joseesparzadc@icloud.com>"]
+version = "0.0.1"
+
+[deps]
+Oxygen = "df9a0d86-3283-4920-82dc-4555fc0d1d8b"
+
+[compat]
+Oxygen = "1.5.2"
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+Mocking = "78c3b35d-d492-501b-9361-3d52fe80e533"
+
+[targets]
+test = ["Test", "Mocking"]
