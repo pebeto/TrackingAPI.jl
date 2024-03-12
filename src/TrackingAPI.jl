@@ -5,20 +5,19 @@ using Dates
 using HTTP
 using Oxygen
 
-include("constants.jl")
 include("routes/health.jl")
 
 """
-    run(; host::String="127.0.0.1", port::Int=8080)
+    run(; host::String="127.0.0.1", port::Int=9000)
 
 Starts the server.
 
-By default, the server will run on `127.0.0.1:8080`. You can change the host
+By default, the server will run on `127.0.0.1:9000`. You can change the host
 and port by passing the `host` and `port` arguments. 
 """
 function run(;
     host::String="127.0.0.1",
-    port::Int=8080
+    port::Int=9000
 )
     health_router = router("/health", tags=["health"])
 

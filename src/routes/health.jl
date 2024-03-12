@@ -9,5 +9,5 @@ function get_health()
         "server_time" => server_time,
     )
 
-    return json(data; status=STATUS_OK)
+    return json(data; status=HTTP.StatusCodes.OK)
 end
