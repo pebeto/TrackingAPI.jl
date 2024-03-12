@@ -1,8 +1,8 @@
 module TrackingAPI
 
-using Dates
-
+using Compat
 using HTTP
+using Dates
 using Oxygen
 
 include("routes/health.jl")

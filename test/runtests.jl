@@ -1,3 +1,4 @@
+using Compat
 using HTTP
 using JSON
 using Test
