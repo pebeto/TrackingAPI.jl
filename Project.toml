@@ -1,6 +1,6 @@
 name = "DearDiary"
 uuid = "bcf306fc-d39d-4f25-b732-26abcc96baf2"
-version = "0.9.1"
+version = "0.10.0"
 authors = ["Jose Esparza <joseesparzadc@gmail.com>"]
 
 [deps]
