@@ -11,3 +11,9 @@ MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 MLJDecisionTreeInterface = "c6f25543-311c-4c74-83dc-3ea6d1015661"
 Memoize = "c03570c3-d221-55d1-a50c-7939bbd78826"
 Oxygen = "df9a0d86-3283-4920-82dc-4555fc0d1d8b"
+
+[compat]
+Bcrypt = "0.1.1"
+DataFrames = "1.8.2"
+JWTs = "1.0.0"
+Oxygen = "1.10.2"

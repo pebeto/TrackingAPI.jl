@@ -3,7 +3,9 @@ module DearDiary
 using Oxygen: headers
 using HTTP
 using JSON
-using JWTs
+# JWTs 1.0 ships its exports in a way that `using JWTs` does not bring them into scope, so import
+# the names this package uses explicitly.
+using JWTs: JWT, JWKSymmetric, sign!, validate!, isvalid, claims
 using Dates
 using Bcrypt
 using Bonito
@@ -172,7 +174,7 @@ function AuthMiddleware(handler)
                 token = string(split(auth_header, " ")[2])
                 jwt = JWT(; jwt=token)
                 key = JWKSymmetric(
-                    JWTs.MD_SHA256, Array{UInt8,1}(_DEARDIARY_APICONFIG.jwt_secret)
+                    "HS256", Array{UInt8,1}(_DEARDIARY_APICONFIG.jwt_secret)
                 )
                 try
                     validate!(jwt, key)

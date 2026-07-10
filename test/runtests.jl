@@ -1,6 +1,8 @@
 using HTTP
 using JSON
-using JWTs
+# JWTs 1.0 does not surface its exports through a plain `using`, so import the names the auth
+# tests construct tokens with explicitly.
+using JWTs: JWT, JWKSymmetric, sign!
 using Test
 using Dates
 using Bcrypt

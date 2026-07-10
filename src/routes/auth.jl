@@ -17,7 +17,7 @@ function issue_token(user::User)::Dict{String,Any}
     expires_at = Int((floor(datetime2unix((now() + Hour(TOKEN_TTL_HOURS))))))
     claims = Dict("sub" => user.username, "id" => user.id, "exp" => expires_at)
     jwt = JWT(; payload=claims)
-    key = JWKSymmetric(JWTs.MD_SHA256, Array{UInt8,1}(_DEARDIARY_APICONFIG.jwt_secret))
+    key = JWKSymmetric("HS256", Array{UInt8,1}(_DEARDIARY_APICONFIG.jwt_secret))
     sign!(jwt, key)
     return Dict{String,Any}(
         "access_token" => (string(jwt)),

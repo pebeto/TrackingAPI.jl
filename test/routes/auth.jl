@@ -117,7 +117,7 @@
                 )
                 jwt = JWT(; payload=claims)
                 key = JWKSymmetric(
-                    JWTs.MD_SHA256,
+                    "HS256",
                     Array{UInt8,1}(DearDiary._DEARDIARY_APICONFIG.jwt_secret),
                 )
                 sign!(jwt, key)
@@ -133,7 +133,7 @@
             @testset "TOKEN_PAYLOAD_INVALID" begin
                 jwt = JWT(; payload=Dict())
                 key = JWKSymmetric(
-                    JWTs.MD_SHA256,
+                    "HS256",
                     Array{UInt8,1}(DearDiary._DEARDIARY_APICONFIG.jwt_secret),
                 )
                 sign!(jwt, key)
@@ -175,7 +175,7 @@
             )
             jwt = JWT(; payload=claims)
             key = JWKSymmetric(
-                JWTs.MD_SHA256, Array{UInt8,1}(DearDiary._DEARDIARY_APICONFIG.jwt_secret)
+                "HS256", Array{UInt8,1}(DearDiary._DEARDIARY_APICONFIG.jwt_secret)
             )
             sign!(jwt, key)
 
@@ -246,7 +246,7 @@
                     "exp" => Int((floor(datetime2unix((now() + Hour(1)))))),
                 )
                 jwt = JWT(; payload=claims)
-                key = JWKSymmetric(JWTs.MD_SHA256, Array{UInt8,1}("incorrect secret"))
+                key = JWKSymmetric("HS256", Array{UInt8,1}("incorrect secret"))
                 sign!(jwt, key)
                 token = string(jwt)
 
@@ -263,7 +263,7 @@
             @testset "with valid JWT but empty payload" begin
                 jwt = JWT(; payload=Dict())
                 key = JWKSymmetric(
-                    JWTs.MD_SHA256,
+                    "HS256",
                     Array{UInt8,1}(DearDiary._DEARDIARY_APICONFIG.jwt_secret),
                 )
                 sign!(jwt, key)
@@ -287,7 +287,7 @@
                 )
                 jwt = JWT(; payload=claims)
                 key = JWKSymmetric(
-                    JWTs.MD_SHA256,
+                    "HS256",
                     Array{UInt8,1}(DearDiary._DEARDIARY_APICONFIG.jwt_secret),
                 )
                 sign!(jwt, key)
@@ -311,7 +311,7 @@
                 )
                 jwt = JWT(; payload=claims)
                 key = JWKSymmetric(
-                    JWTs.MD_SHA256,
+                    "HS256",
                     Array{UInt8,1}(DearDiary._DEARDIARY_APICONFIG.jwt_secret),
                 )
                 sign!(jwt, key)
@@ -335,7 +335,7 @@
                 )
                 jwt = JWT(; payload=claims)
                 key = JWKSymmetric(
-                    JWTs.MD_SHA256,
+                    "HS256",
                     Array{UInt8,1}(DearDiary._DEARDIARY_APICONFIG.jwt_secret),
                 )
                 sign!(jwt, key)
@@ -359,7 +359,7 @@
                 )
                 jwt = JWT(; payload=claims)
                 key = JWKSymmetric(
-                    JWTs.MD_SHA256,
+                    "HS256",
                     Array{UInt8,1}(DearDiary._DEARDIARY_APICONFIG.jwt_secret),
                 )
                 sign!(jwt, key)
