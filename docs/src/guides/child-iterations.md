@@ -36,7 +36,7 @@ cross-experiment parent returns [`DearDiary.Unprocessable`](@ref), so a misconfi
 sweep cannot produce orphaned children.
 
 ```@repl child-iterations
-trial_ids = Int64[];
+trial_ids = String[];
 for depth in 2:5
     trial_id, _ = create_iteration(experiment_id; parent_iteration_id=driver_id)
     create_parameter(trial_id, "max_depth", depth)
@@ -70,7 +70,7 @@ succeeded = get_iteration(succeeded_id);
 A trial that throws is captured the same way: the exception body is preserved on the row.
 
 ```@example child-iterations
-failed_id = Ref{Int64}(0)
+failed_id = Ref{String}()
 try
     DearDiary.with_iteration(experiment_id; parent_iteration_id=driver_id) do iter
         failed_id[] = iter.id
