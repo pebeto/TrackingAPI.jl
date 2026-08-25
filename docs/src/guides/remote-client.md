@@ -1,8 +1,10 @@
 # Log from a remote client
 
-When the training script runs on a different machine, use the bundled Julia client. Every
-CRUD verb has a [`Client`](@ref)-aware overload, and [`with_iteration`](@ref) auto-finalises
-an iteration on success or exception. Start the server first (see [Run the server](@ref)).
+When the training script runs on a different machine, use the bundled Julia client. Most
+CRUD verbs have a [`Client`](@ref)-aware overload. Tags are the exception: attach one with
+`add_tag`, since the local `create_tag` has no REST counterpart. [`with_iteration`](@ref)
+auto-finalises an iteration on success or exception. Start the server first (see
+[Run the server](@ref)).
 
 ```julia
 using DearDiary

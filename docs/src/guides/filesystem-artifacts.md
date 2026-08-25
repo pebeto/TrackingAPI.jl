@@ -1,15 +1,15 @@
 # Store artifacts on a filesystem
 
 By default, DearDiary stores every [`Resource`](@ref DearDiary.Resource) artifact inline in the database.
-That works for kilobyte-sized configs and small pickled models, but a 500 MB checkpoint
-will balloon the database file and slow every metadata query. The
+That works for kilobyte-sized configs and small serialised models, but a 500 MB checkpoint
+will substantially increase the database file size and slow every metadata query. The
 [`DearDiary.FilesystemStore`](@ref) backend writes artifact bytes to a directory on local
-disk, keeping the database lean and letting you back up the bytes with the rest of your
-storage volume.
+disk, keeping the database file smaller and allowing the bytes to be backed up along with
+the rest of the storage volume.
 
 ## Configuration
 
-Set two environment variables in your `.env`:
+Set two environment variables in the `.env` file:
 
 ```text
 DEARDIARY_ARTIFACT_BACKEND=filesystem

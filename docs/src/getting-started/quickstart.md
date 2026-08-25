@@ -15,7 +15,7 @@ using DearDiary
 DearDiary.initialize_database()
 ```
 
-Create a project and an experiment to hold your runs.
+Create a project and an experiment to hold the runs.
 
 ```@repl quickstart
 project_id, _ = create_project("Iris classification")

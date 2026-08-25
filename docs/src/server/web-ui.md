@@ -7,9 +7,9 @@
     production tooling on top of its HTML or hard-code its routes into
     automation.
 
-DearDiary boots a small in-process web dashboard alongside the REST API. Use it to
-browse projects, experiments, and iterations recorded by the default user, inspect
-parameters and metric charts for any iteration, and follow parent/child trial trees.
+DearDiary boots a small in-process web dashboard alongside the REST API. It supports
+browsing projects, experiments, and iterations recorded by the default user; inspecting
+parameters and metric charts for any iteration; and following parent/child trial trees.
 
 ## Configuration
 
@@ -24,7 +24,7 @@ DEARDIARY_UI_PORT=9001          # port the dashboard listens on
 `DearDiary.run(; env_file=".env")` boots the REST API and the dashboard on their
 respective ports. `DearDiary.stop()` closes both servers together.
 
-## What you see
+## Dashboard contents
 
 - **Sidebar:** A tree of projects, experiments, and iterations. Child
   trials nest under their driver iteration so lineage stays visible. Each
@@ -32,17 +32,23 @@ respective ports. `DearDiary.stop()` closes both servers together.
   `✗` failed, `⊘` killed), a per-experiment ordinal, and a relative
   timestamp (example: `✓ Iteration 3 · 12m ago`). Link color (yellow
   running, red failed, purple killed, default succeeded) reinforces the
-  status. Ordinals are local to each experiment, so deleting a row
-  renumbers the remaining iterations. The canonical database id appears in
-  the detail pane header and the browser tab title.
-- **Detail pane:** A status badge, the experiment name, created/ended
-  timestamps, the parent-iteration link when present, the parameter table,
-  and an inline-SVG chart of every metric series keyed by step. Hovering a
-  point shows a tooltip with the metric name, step, and value. The chart
-  renders server-side with no external JS bundle.
+  status. The selected row keeps a highlight until another row is
+  clicked. Ordinals are local to each experiment and are derived from
+  creation order, so deleting a row renumbers the remaining iterations.
+- **Detail pane:** A heading carrying the per-experiment ordinal, a status
+  badge, the experiment name, the canonical iteration id on its own `ID:`
+  line, created and ended timestamps, the run duration, the parent
+  iteration's ordinal when present, any run notes, any tags as chips, the
+  parameter table, and an inline-SVG chart of every metric series keyed by
+  step. Hovering a point shows a tooltip with the metric name, step, and
+  value. The chart renders server-side with no external JS bundle.
+- **Environment card:** The reproducibility snapshot captured for the
+  iteration: Julia version, git commit (flagged when the working tree was
+  dirty), and entrypoint. Iterations without a snapshot, including child
+  runs that inherit the driver's, report that none was captured.
 - **Browser tab title:** Tracks the selected iteration as
-  `#42 · ExperimentName · DearDiary`. The landing page renders as plain
-  `DearDiary`.
+  `#3 · ExperimentName · DearDiary`, using the same per-experiment ordinal
+  as the sidebar. The landing page renders as plain `DearDiary`.
 - **Docs link:** A `Docs ↗` anchor at the bottom of the sidebar opens
   this documentation site in a new tab.
 

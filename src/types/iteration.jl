@@ -26,7 +26,7 @@ Fields
   for REPL-driven runs.
 - `project_toml::String`: Verbatim contents of the active `Project.toml` at snapshot time.
 - `manifest_toml::String`: Verbatim contents of the active `Manifest.toml` at snapshot time,
-  the bit-exact dependency tree that [`restore`](@ref) reconstructs.
+  the pinned dependency tree that [`restore`](@ref) reconstructs.
 """
 struct Iteration <: ResultType
     id::String

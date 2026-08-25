@@ -1,7 +1,7 @@
 # Register and stage models
 
 [`DearDiary.Model`](@ref) and [`DearDiary.ModelVersion`](@ref) form a project-scoped
-registry on top of the run-tracking entities. A `Model` is the named bucket that downstream
+registry on top of the run-tracking entities. A `Model` is the named entry that downstream
 serving code refers to (e.g. `"fraud-classifier"`); a `ModelVersion` is a concrete
 checkpoint with lineage back to the [`Iteration`](@ref DearDiary.Iteration) that produced it, an optional
 pointer at the artifact bytes in any configured storage backend, and a lifecycle
@@ -27,7 +27,7 @@ create_metric(iteration_id, "accuracy", 0.96);
 ```
 
 Save the trained model bytes as a [`Resource`](@ref DearDiary.Resource). Any serialisation format works; the
-registry cares only about the byte payload and its lineage.
+registry stores only the byte payload and its lineage.
 
 ```@repl model-registry
 checkpoint_bytes = rand(UInt8, 1024);
@@ -36,8 +36,8 @@ resource_id, _ = create_resource(experiment_id, "fraud-clf.jlso", checkpoint_byt
 
 ## Register the model
 
-A `Model` is a named entry: the human-readable handle that survives across hundreds of
-training runs.
+A `Model` is a named entry: a stable identifier that persists across successive training
+runs and model versions.
 
 ```@repl model-registry
 model_id, _ = create_model(project_id, "fraud-classifier");
@@ -50,8 +50,8 @@ get_model(model_id)
 ## Register a version
 
 A `ModelVersion` ties a [`Resource`](@ref DearDiary.Resource) to the [`Iteration`](@ref DearDiary.Iteration) that produced it.
-The per-model version number is assigned by the server (gap-free, monotonic, unique within
-the model):
+The per-model version number is assigned on insert as one greater than the model's current
+highest version, and a uniqueness constraint keeps it distinct within the model:
 
 ```@repl model-registry
 version_a_id, _ = create_modelversion(
@@ -65,7 +65,7 @@ version_a = get_modelversion(version_a_id)
 ```
 
 A freshly registered version starts in [`DearDiary.NO_STAGE`](@ref). Promote it through the
-lifecycle as the model proves itself in evaluation:
+lifecycle as evaluation results become available:
 
 ```@repl model-registry
 update_modelversion(version_a_id, DearDiary.STAGING, nothing, nothing);
@@ -78,7 +78,7 @@ update_modelversion(version_a_id, DearDiary.PRODUCTION, nothing, nothing);
 ## Roll forward to a new checkpoint
 
 Train another iteration, register a second version, and promote it to `PRODUCTION`. The
-previous incumbent is auto-archived in the same transaction:
+previous production version is archived by the same `update_modelversion` call:
 
 ```@repl model-registry
 iteration_b_id, _ = create_iteration(experiment_id);

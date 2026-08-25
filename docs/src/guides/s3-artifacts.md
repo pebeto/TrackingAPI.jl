@@ -1,13 +1,13 @@
 # Store artifacts in an S3-compatible store
 
-For multi-machine deployments or large checkpoints, artifact bytes belong in an object store
-rather than on a single server's disk. DearDiary's [`DearDiary.S3Store`](@ref) backend
-speaks the S3 wire protocol via a built-in SigV4 signer. The same struct talks to AWS S3,
-MinIO, Cloudflare R2, Backblaze B2, or any S3-compatible service: set the right `endpoint`
-URL and bucket name.
+For multi-machine deployments or large checkpoints, artifact bytes are commonly stored in an
+object store rather than on a single server's disk. DearDiary's [`DearDiary.S3Store`](@ref)
+backend implements the S3 wire protocol via a built-in SigV4 signer. The same struct
+communicates with AWS S3, MinIO, Cloudflare R2, Backblaze B2, or any S3-compatible service:
+set the right `endpoint` URL and bucket name.
 
 Path-style addressing (`<endpoint>/<bucket>/<key>`) is used throughout, so this works
-against MinIO out of the box and against AWS S3 buckets created before the
+against MinIO without additional configuration and against AWS S3 buckets created before the
 virtual-hosted-style cutover.
 
 ## Configuration for AWS S3
@@ -36,7 +36,7 @@ docker run --rm -p 9000:9000 -p 9001:9001 \
 ```
 
 Create the bucket via the MinIO web console at `http://localhost:9001`, or with
-`mc mb local/deardiary` if you have the MinIO client installed. Then point DearDiary at it:
+`mc mb local/deardiary` if the MinIO client is installed. Then point DearDiary at it:
 
 ```text
 DEARDIARY_ARTIFACT_BACKEND=s3
@@ -74,8 +74,8 @@ the `.env`. Keep this REPL running.
 
 ### Connect and upload from a training script
 
-In another Julia session (typically your training script on a different machine), connect
-and write artifacts the same way you would against any other backend. The bytes go straight
+In another Julia session (typically a training script on a different machine), connect
+and write artifacts the same way as against any other backend. The bytes go straight
 to the bucket; the resource row records only the metadata and URI.
 
 ```julia
@@ -111,7 +111,7 @@ DearDiary.run(; env_file=".env")
 DearDiary.migrate_artifacts!()
 ```
 
-Per-row failures (network blip, AWS 503, etc.) are logged and skipped. The offending row
+Per-row failures (a dropped connection, an AWS 503, and similar) are logged and skipped. The offending row
 keeps its `backend = "inline"` value and is retried on the next invocation. Already-migrated
 rows are detected by their `backend` field and skipped, so re-running picks up where it
 stopped.
@@ -120,9 +120,9 @@ stopped.
 
 - Every read issues an `s3:GetObject` call. A serving layer that reloads a model on every
   request should cache locally; the metadata `content_hash` field makes a "fetch only if
-  changed" pattern straightforward.
+  changed" pattern possible.
 - The on-write hash is computed in-process and sent as the `X-Amz-Content-Sha256` header.
   Bytes are never written to local disk en route.
 - Deletes via `delete_resource` issue a single `s3:DeleteObject` with no archival or
-  soft-delete. If your bucket has versioning enabled, the delete becomes a tombstone
+  soft-delete. If bucket versioning is enabled, the delete becomes a tombstone
   instead.

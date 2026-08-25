@@ -6,7 +6,7 @@ produce identical data; the choice affects concurrency, authentication, and depl
 
 ## Offline mode
 
-Call the service functions directly from the same Julia process that runs your training
+Call the service functions directly from the same Julia process that runs the training
 code. There is no server to start and no network involved.
 
 ```julia
@@ -23,9 +23,8 @@ with_iteration(experiment_id) do iter
 end
 ```
 
-`create_project(name)` uses the seeded `default` user. There is no authentication
-prompt. This is the most convenient path for a single training job or notebook session on
-a laptop.
+`create_project(name)` uses the seeded `default` user. There is no authentication prompt.
+This suits a single training job or notebook session on a laptop.
 
 Offline mode stores metadata in a local DuckDB file (`deardiary.db` by default, overridden
 by the `file_name` argument to `initialize_database`). The file is portable: copy it
@@ -60,8 +59,9 @@ The server injects the authenticated user into each request via `AuthMiddleware`
 authentication is disabled (`DEARDIARY_ENABLE_AUTH=false`, the default), the `default` user
 is implied, matching the offline behaviour.
 
-Multiple training jobs can write to the same server simultaneously. Use server mode for team
-workflows, scheduled jobs, or any setup where more than one process produces tracking data.
+Multiple training jobs can write to the same server simultaneously. Server mode is
+appropriate for scheduled jobs or any setup where more than one process writes tracking data
+concurrently.
 
 ## Choosing a mode
 
@@ -72,5 +72,5 @@ workflows, scheduled jobs, or any setup where more than one process produces tra
 | Concurrent writers | Single process | Multiple processes |
 | Data location | Local DuckDB file | Server-side DuckDB file |
 
-Start with offline mode. Switch to server mode when you need concurrent writers or want
-to separate the tracking store from the training machines.
+Offline mode is the simpler starting point. Server mode is appropriate when concurrent
+writers are required or the tracking store needs to be separated from the training machines.

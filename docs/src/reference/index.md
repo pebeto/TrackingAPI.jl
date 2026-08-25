@@ -1,5 +1,5 @@
 # Symbol index
-One link to everything in the API reference.
+Alphabetical index of every documented symbol in the API reference.
 
 ```@index
 ```

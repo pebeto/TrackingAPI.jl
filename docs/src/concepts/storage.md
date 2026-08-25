@@ -1,7 +1,7 @@
 # Storage
 
 DearDiary uses two storage layers: a metadata database and an artifact backend. They are
-configured independently so you can mix a local database with remote artifact storage.
+configured independently, so a local database can be paired with remote artifact storage.
 
 ## Metadata: DuckDB
 

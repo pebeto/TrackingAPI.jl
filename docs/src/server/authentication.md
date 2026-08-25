@@ -34,7 +34,7 @@ The response envelope:
   "access_token": "<jwt>",
   "token_type": "Bearer",
   "expires_at": 1234567890,
-  "user": { "id": 1, "username": "alice", "is_admin": false, ... }
+  "user": { "id": "8f14e45f-ceea-467a-9c1e-1b1f9c0d3a52", "username": "alice", "is_admin": false, ... }
 }
 ```
 

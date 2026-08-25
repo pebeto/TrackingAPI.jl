@@ -1,8 +1,9 @@
 # Reproducibility
 
-A model result is only useful if it can be reproduced. DearDiary addresses this by
-capturing the full Julia environment at the moment a run starts and storing it alongside
-the iteration's metrics and parameters.
+Reproducing a model result requires recovering the code, data, and environment that produced
+it. DearDiary addresses the environment part by capturing the Julia dependency environment
+and git state at the moment a run starts and storing it alongside the iteration's metrics and
+parameters.
 
 ## What gets captured
 
@@ -19,7 +20,7 @@ Each [`Iteration`](@ref DearDiary.Iteration) can hold an [`EnvironmentSnapshot`]
 
 The snapshot is taken by [`capture_environment`](@ref) and persisted on the iteration row
 by [`snapshot_environment!`](@ref). Both functions never throw: a missing git repo, an
-unresolved environment, and a REPL session all degrade gracefully to empty strings.
+unresolved environment, and a REPL session all fall back to empty strings.
 
 ## Automatic capture
 
@@ -63,15 +64,15 @@ Pkg.instantiate()
 ```
 
 `result` is a [`RestoreResult`](@ref) that also carries `julia_version`, `git_sha`,
-`git_dirty`, and `entrypoint`, so you can check whether the captured commit was clean and
+`git_dirty`, and `entrypoint`, so callers can check whether the captured commit was clean and
 optionally check out the exact SHA before re-running.
 
-## Why Manifest.toml over pip freeze
+## Manifest.toml compared with pip freeze
 
 `pip freeze` records direct and transitive dependency versions as version constraints. On
 install, the solver re-runs and may pick different patch versions depending on what is
 available at that moment. Julia's `Manifest.toml` records the exact resolved tree, including
-hashes: `Pkg.instantiate` does not re-resolve, it fetches the pinned versions. The captured
+hashes. `Pkg.instantiate` fetches the pinned versions without re-resolving them. The captured
 manifest reproduces the same tree regardless of how the registry has moved on since the
 original run.
 

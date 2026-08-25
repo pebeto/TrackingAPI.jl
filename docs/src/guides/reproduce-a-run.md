@@ -1,12 +1,13 @@
 # Reproduce a past run
 
-Every [`Iteration`](@ref DearDiary.Iteration) can carry a bit-exact snapshot of the Julia environment that
+Every [`Iteration`](@ref DearDiary.Iteration) can carry a snapshot of the Julia environment that
 produced it: `julia_version`, the HEAD commit SHA, the verbatim `Project.toml` and
-`Manifest.toml` active at run start, and the entrypoint script. Months later,
-[`restore`](@ref) writes that snapshot back to disk so the exact dependency tree can be
-`Pkg.instantiate`-d in a fresh depot. Other ML trackers capture environments as `pip freeze`
-strings that re-resolve transitive dependencies on install. Julia's `Manifest.toml` is
-byte-exact, so the captured tree round-trips with no resolution drift.
+`Manifest.toml` active at run start, and the entrypoint script. [`restore`](@ref) later
+writes that snapshot back to disk so the pinned dependency tree can be `Pkg.instantiate`-d in
+a fresh depot. Unlike a `pip freeze` file, which records version numbers and can re-resolve
+transitive dependencies on install, `Manifest.toml` pins each package to a specific version
+and tree hash, so `Pkg.instantiate` reinstalls the same package versions without re-resolving
+them.
 
 ```@setup reproduce-a-run
 using DearDiary
@@ -16,9 +17,9 @@ DearDiary.initialize_database(; file_name=joinpath(mktempdir(), "deardiary.db"))
 ## Capture happens automatically on the driver iteration
 
 [`DearDiary.with_iteration`](@ref) calls [`snapshot_environment!`](@ref) right after
-creating the iteration, but only when the new run has no parent. Driver runs capture; child
-runs (HPO trials, distributed workers) inherit. Override with the `snapshot` keyword for
-different behavior.
+creating the iteration, but only when the new run has no parent. Driver runs capture a
+snapshot; child runs (HPO trials, distributed workers) skip it and rely on the driver's copy.
+The `snapshot` keyword overrides this default in either direction.
 
 ```@repl reproduce-a-run
 project_id, _ = create_project("Repro Project");
@@ -78,8 +79,8 @@ isfile(joinpath(result.project_path, "Project.toml")), isfile(joinpath(result.pr
 ```
 
 The on-disk files are byte-identical to what was captured. Loading them with `using Pkg;
-Pkg.activate(result.project_path); Pkg.instantiate()` reconstructs the exact dependency
-tree the iteration ran against:
+Pkg.activate(result.project_path); Pkg.instantiate()` reinstalls the same pinned package
+versions the iteration ran against:
 
 ```julia
 using Pkg
@@ -89,7 +90,7 @@ Pkg.instantiate()
 # `git checkout $(result.git_sha)` and `julia --project=$(result.project_path) $(result.entrypoint)`
 ```
 
-## What is and isn't captured
+## What is and is not captured
 
 | Captured | Not captured |
 |---|---|
@@ -99,10 +100,10 @@ Pkg.instantiate()
 | Active `Manifest.toml` (verbatim) | Datasets used by the run (separate concern) |
 | Entrypoint script path | Runtime config files outside the project |
 
-If `git_dirty` is `true`, the captured Manifest alone is not sufficient for full
-reproducibility. Uncommitted source changes must be reapplied manually. Run reproducible
-jobs from a clean working tree; the snapshot lets you verify after the fact whether the
-tree was clean.
+If `git_dirty` is `true`, the captured Manifest alone does not describe the code that ran:
+uncommitted source changes must be reapplied manually. Reproducible jobs should be run from
+a clean working tree, and the `git_dirty` flag records whether the tree was clean at capture
+time.
 
 ```@setup reproduce-a-run
 DearDiary.close_database()

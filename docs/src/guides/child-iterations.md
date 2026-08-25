@@ -2,10 +2,10 @@
 
 An [`Iteration`](@ref DearDiary.Iteration) can declare another iteration as its parent via
 `parent_iteration_id`, which models any one-to-many "owner run produced N child runs"
-relationship: a hyperparameter sweep that spawns one trial per configuration, a nested
-cross-validation outer loop that owns each fold, or a distributed training job whose driver
-fans out to per-worker iterations. The parent must be in the same experiment as its children
-(cross-experiment lineage is rejected), and each child also tracks its own
+relationship, such as a hyperparameter sweep that spawns one trial per configuration or a
+distributed training job whose driver fans out to per-worker iterations. The parent must be
+in the same experiment as its children (cross-experiment lineage is rejected), and each child
+also tracks its own
 [`DearDiary.IterationStatus`](@ref) (`RUNNING` / `SUCCEEDED` / `FAILED` / `KILLED`).
 
 ```@setup child-iterations
@@ -48,8 +48,8 @@ trial_ids
 
 ## Auto-finalised trials with `with_iteration`
 
-Real sweeps don't always succeed. A malformed configuration or an out-of-memory error can
-take a trial down. The [`DearDiary.with_iteration`](@ref) helper opens a fresh child
+Sweeps do not always succeed. A malformed configuration or an out-of-memory error can
+cause a trial to fail. The [`DearDiary.with_iteration`](@ref) helper opens a fresh child
 iteration, runs the body, marks the row [`DearDiary.SUCCEEDED`](@ref) on a clean return,
 or marks it [`DearDiary.FAILED`](@ref) with the captured exception text in `error_message`
 and rethrows so the caller still sees the error:
@@ -74,10 +74,10 @@ failed_id = Ref{String}()
 try
     DearDiary.with_iteration(experiment_id; parent_iteration_id=driver_id) do iter
         failed_id[] = iter.id
-        error("OutOfMemoryError: max_depth=12 blew the heap")
+        error("OutOfMemoryError: max_depth=12 exhausted available memory")
     end
 catch
-    # The driver swallowed the exception so the rest of the sweep can carry on.
+    # The driver handles the exception so the remaining trials still run.
 end
 nothing # hide
 ```
@@ -89,9 +89,9 @@ failed = get_iteration(failed_id[]);
 
 ## Walking the tree
 
-[`get_child_iterations`](@ref) returns the direct children of a parent, ordered by id
-ascending. Combine it with [`get_parameters`](@ref) and [`get_metrics`](@ref) to find the
-best trial of a sweep:
+[`get_child_iterations`](@ref) returns the direct children of a parent, ordered by creation
+date ascending. Combine it with [`get_parameters`](@ref) and [`get_metrics`](@ref) to find
+the best trial of a sweep:
 
 ```@repl child-iterations
 children = get_child_iterations(driver_id);
@@ -106,9 +106,10 @@ best_depth = get_parameters(best.id)[1].value
 ## Cascading deletes
 
 Children are independent rows: deleting the parent does **not** delete its children.
-The schema's foreign-key action sets each surviving child's `parent_iteration_id` to
-`NULL`, so they continue to exist as standalone iterations until explicitly removed. This
-preserves historical training results even when the driver run is pruned.
+[`delete_iteration`](@ref) sets each surviving child's `parent_iteration_id` to `NULL` before
+removing the parent row, so the children continue to exist as standalone iterations until
+explicitly removed. This preserves historical training results even when the driver run is
+pruned.
 
 ```@repl child-iterations
 delete_iteration(driver_id);
