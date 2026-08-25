@@ -57,4 +57,4 @@ makedocs(;
     warnonly=[:cross_references, :missing_docs],
 )
 
-deploydocs(; repo="github.com/JuliaAI/DearDiary.jl.git")
+deploydocs(; repo="github.com/JuliaAI/DearDiary.jl.git", devbranch="dev")
